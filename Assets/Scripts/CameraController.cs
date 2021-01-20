@@ -14,7 +14,10 @@ namespace RollaBall
         // Update is called once per frame
         private void LateUpdate()
         {
-            transform.position = Player.transform.position + _offset;
+            if (Player)
+            { 
+                transform.position = Player.transform.position + _offset;
+            }
         }
     }
 }
