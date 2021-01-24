@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System;
+using Random = UnityEngine.Random;
 
 namespace RollaBall
 {
@@ -7,18 +9,33 @@ namespace RollaBall
 
         private float _lengthFly;
         private float _speedRotation;
-        private PlayerChanges _playerChange;
+        public delegate void CaughtPlayerChange(object value);
+        private event EventHandler<CaughtPlayerEventArgs> _caughtPlayerChange;
+        public event EventHandler<CaughtPlayerEventArgs> CaughtPlayer
+        {
+            add
+            {
+                _caughtPlayerChange += value;
+            }
+            remove
+            {
+                _caughtPlayerChange -= value;
+            }
+        }
+        // private PlayerChanges _playerChange;
 
-        private void Awake()
+        private void Awake() 
         {
             _lengthFly = Random.Range(1.0f, 5.0f);
             _speedRotation = Random.Range(10.0f, 50.0f);
-            _playerChange = FindObjectOfType<PlayerChanges>();
+            
+            //_playerChange = FindObjectOfType<PlayerChanges>();
         }
 
         protected override void Interaction()
         {
-            _playerChange.Die();
+            //_playerChange.Die();
+            _caughtPlayerChange?.Invoke(this, new CaughtPlayerEventArgs(_color));
         }
 
         public void Fly()

@@ -1,11 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace RollaBall
 {
-    public abstract class InteractiveObject : MonoBehaviour, IInteractable
+    public abstract class InteractiveObject : MonoBehaviour, IInteractable, IComparable<InteractiveObject>
     {
         public bool IsInteractable { get; } = true;
+        protected Color _color;
 
         private void OnTriggerEnter(Collider other)
         {
@@ -26,10 +28,16 @@ namespace RollaBall
 
         public void Action()
         {
+            _color = Random.ColorHSV();
             if (TryGetComponent(out Renderer renderer))
             {
-                renderer.material.color = Random.ColorHSV();
+                renderer.material.color = _color;
             }
+        }
+
+        public int CompareTo(InteractiveObject other)
+        {
+            return name.CompareTo(other.name);
         }
     }
 }
