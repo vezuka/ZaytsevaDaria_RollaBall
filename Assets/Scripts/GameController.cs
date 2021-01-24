@@ -1,23 +1,37 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace RollaBall
 {
     public sealed class GameController : MonoBehaviour, IDisposable
     {
-        private InteractiveObject[] _interactiveObjects;
+        // private InteractiveObject[] _interactiveObjects;
+        public Text GameOverText;
+        private ListInteractableObject _interactiveObjects;
         private PlayerChanges _playerChanges;
+        private DisplayEndGame _displayEndGame;
 
         private void Awake()
         {
-            _interactiveObjects = FindObjectsOfType<InteractiveObject>();
+            _interactiveObjects = new ListInteractableObject();
             _playerChanges = FindObjectOfType<PlayerChanges>();
-            Debug.Log(_playerChanges);
+            _displayEndGame = new DisplayEndGame(GameOverText);
+            
+            foreach (var item in _interactiveObjects)
+            {
+                if (item is BadBonus badBonus)
+                {
+                    badBonus.CaughtPlayer += _displayEndGame.GameOver;
+                    badBonus.CaughtPlayer += CaughtPlayer;
+                }
+            }
+
         }
 
         private void Update()
         {
-            for (var i=0; i < _interactiveObjects.Length; i++ )
+            for (var i=0; i < _interactiveObjects.Count; i++ )
             {
                 var interactiveObject = _interactiveObjects[i];
 
@@ -48,11 +62,25 @@ namespace RollaBall
             }
         }
 
+        private void CaughtPlayer(object value, CaughtPlayerEventArgs args)
+        {
+            Time.timeScale = 0.0f;
+        }
+
         public void Dispose()
         {
-            foreach (var o in _interactiveObjects)
+            foreach (var item in _interactiveObjects)
             {
-                Destroy(o.gameObject);
+                if (item is InteractiveObject interactiveObject)
+                {
+                    if (item is BadBonus badBonus)
+                    {
+                        badBonus.CaughtPlayer -= CaughtPlayer;
+                        badBonus.CaughtPlayer -= _displayEndGame.GameOver;
+                    }
+
+                    Destroy(interactiveObject.gameObject);
+                }
             }
         }
 

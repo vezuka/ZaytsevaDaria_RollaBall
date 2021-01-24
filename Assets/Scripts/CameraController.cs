@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Data;
+using UnityEngine;
 
 namespace RollaBall
 {
@@ -18,6 +19,11 @@ namespace RollaBall
             { 
                 transform.position = Player.transform.position + _offset;
             }
+            else
+            {
+                throw new DataException("Player not found");
+            }
+            
         }
     }
 }
